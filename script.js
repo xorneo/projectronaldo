@@ -1,5 +1,5 @@
 // Define initial attributes and their ratings with weight for each user
-const users = {
+let users = {
     "Zane": {
         age: 30,
         country: "Malaysia",
@@ -92,6 +92,12 @@ const users = {
     }
 };
 
+// Load users from localStorage if available
+const savedUsers = localStorage.getItem('users');
+if (savedUsers) {
+    users = JSON.parse(savedUsers);
+}
+
 // Current user
 let currentUser = "Zane";
 
@@ -171,6 +177,7 @@ document.getElementById('update-form').addEventListener('submit', function(event
     const newValue = parseInt(document.getElementById('new-value').value, 10);
     if (attribute in users[currentUser].attributes[category].items && !isNaN(newValue) && newValue >= 0 && newValue <= 100) {
         users[currentUser].attributes[category].items[attribute] = newValue;
+        localStorage.setItem('users', JSON.stringify(users)); // Save to localStorage
         displayAttributes(currentUser);
         document.getElementById('overall-score').textContent = calculateOverallScore(currentUser);
     }
