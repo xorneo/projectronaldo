@@ -1,3 +1,5 @@
+import { supabase } from './supabase-config.js';
+
 // Define initial attributes and their ratings with weight for each user
 let users = {
     "Zane": {
@@ -92,10 +94,34 @@ let users = {
     }
 };
 
-// Load users from localStorage if available
-const savedUsers = localStorage.getItem('users');
-if (savedUsers) {
-    users = JSON.parse(savedUsers);
+// Load users from Supabase
+async function fetchUserData() {
+    console.log("Fetching user data for:", currentUser);
+    const { data, error } = await supabase
+        .from('users')
+        .select('*')
+        .eq('name', currentUser)
+        .single();
+
+    if (error) {
+        console.error('Error fetching user data:', error);
+    } else {
+        console.log("User data:", data);
+        users[currentUser] = data;
+        displayAttributes(currentUser);
+        document.getElementById('overall-score').textContent = calculateOverallScore(currentUser);
+    }
+}
+
+async function updateUserData() {
+    const { error } = await supabase
+        .from('users')
+        .update({ attributes: users[currentUser].attributes })
+        .eq('name', currentUser);
+
+    if (error) {
+        console.error('Error updating user data:', error);
+    }
 }
 
 // Current user
@@ -170,14 +196,14 @@ function populateDropdowns() {
 }
 
 // Function to update attribute
-document.getElementById('update-form').addEventListener('submit', function(event) {
+document.getElementById('update-form').addEventListener('submit', async function(event) {
     event.preventDefault();
     const category = document.getElementById('category').value;
     const attribute = document.getElementById('attribute').value;
     const newValue = parseInt(document.getElementById('new-value').value, 10);
     if (attribute in users[currentUser].attributes[category].items && !isNaN(newValue) && newValue >= 0 && newValue <= 100) {
         users[currentUser].attributes[category].items[attribute] = newValue;
-        localStorage.setItem('users', JSON.stringify(users)); // Save to localStorage
+        await updateUserData();
         displayAttributes(currentUser);
         document.getElementById('overall-score').textContent = calculateOverallScore(currentUser);
     }
@@ -188,8 +214,7 @@ document.getElementById('user-select').addEventListener('change', function(event
     currentUser = event.target.value;
     document.getElementById('user-name').textContent = currentUser;
     document.getElementById('user-age').textContent = users[currentUser].age;
-    displayAttributes(currentUser);
-    document.getElementById('overall-score').textContent = calculateOverallScore(currentUser);
+    fetchUserData();
     populateDropdowns();
 });
 
@@ -202,7 +227,7 @@ document.getElementById('password-form').addEventListener('submit', function(eve
         document.getElementById('content').style.display = 'block';
         document.getElementById('user-name').textContent = currentUser;
         document.getElementById('user-age').textContent = users[currentUser].age;
-        displayAttributes(currentUser);
+        fetchUserData();
         populateDropdowns();
         document.getElementById('overall-score').textContent = calculateOverallScore(currentUser);
     } else {
@@ -211,3 +236,4 @@ document.getElementById('password-form').addEventListener('submit', function(eve
 });
 
 // Initialize the page
+fetchUserData();
