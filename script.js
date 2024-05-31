@@ -9,10 +9,12 @@ let currentUser = "Zane";
 
 // Fetch user data from Firestore
 async function fetchUserData() {
+    console.log("Fetching user data for:", currentUser);
     const docRef = doc(db, "users", currentUser);
     const docSnap = await getDoc(docRef);
 
     if (docSnap.exists()) {
+        console.log("User data:", docSnap.data());
         users[currentUser] = docSnap.data();
         displayAttributes(currentUser);
         document.getElementById('overall-score').textContent = calculateOverallScore(currentUser);
@@ -112,7 +114,10 @@ document.getElementById('update-form').addEventListener('submit', async function
 // Function to switch user
 document.getElementById('user-select').addEventListener('change', function(event) {
     currentUser = event.target.value;
+    document.getElementById('user-name').textContent = currentUser;
+    document.getElementById('user-age').textContent = users[currentUser].age;
     fetchUserData();
+    populateDropdowns();
 });
 
 // Function to check password
@@ -122,7 +127,11 @@ document.getElementById('password-form').addEventListener('submit', function(eve
     if (password === 'sui') {
         document.getElementById('password-container').style.display = 'none';
         document.getElementById('content').style.display = 'block';
+        document.getElementById('user-name').textContent = currentUser;
+        document.getElementById('user-age').textContent = users[currentUser].age;
         fetchUserData();
+        populateDropdowns();
+        document.getElementById('overall-score').textContent = calculateOverallScore(currentUser);
     } else {
         alert('Incorrect password');
     }
