@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Project Ronaldo</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Project Ronaldo</h1>
+        </header>
+        <div id="password-container">
+            <form id="password-form">
+                <label for="password">Enter Password:</label>
+                <input type="password" id="password" name="password">
+                <input type="submit" value="Submit">
+            </form>
+        </div>
+        <div id="content" style="display:none;">
+            <main>
+                <section class="profile">
+                    <div class="profile-info">
+                        <h2 id="user-name">Zane</h2>
+                        <p>Overall Weighted Score: <span id="overall-score">0</span></p>
+                        <p>Age: <span id="user-age">30</span></p>
+                        <p>Country: Malaysia</p>
+                    </div>
+                    <div class="user-select">
+                        <label for="user-select">Switch User:</label>
+                        <select id="user-select">
+                            <option value="Zane">Zane</option>
+                            <option value="Marc">Marc Chin</option>
+                        </select>
+                    </div>
+                </section>
+                <section class="attributes">
+                    <h3>Attributes</h3>
+                    <div id="attributes-list">
+                        <!-- Attributes will be dynamically loaded here -->
+                    </div>
+                </section>
+                <section class="update">
+                    <h3>Update Attribute</h3>
+                    <form id="update-form">
+                        <label for="category">Category:</label>
+                        <select name="category" id="category">
+                            <!-- Options will be dynamically loaded here -->
+                        </select>
+                        <br>
+                        <label for="attribute">Attribute:</label>
+                        <select name="attribute" id="attribute">
+                            <!-- Options will be dynamically loaded here -->
+                        </select>
+                        <br>
+                        <label for="new-value">New Value:</label>
+                        <input type="number" name="new-value" id="new-value" min="0" max="100">
+                        <br>
+                        <input type="submit" value="Update">
+                    </form>
+                </section>
+            </main>
+            <footer>
+                <p>&copy; 2024 Project Ronaldo</p>
+            </footer>
+        </div>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html>
