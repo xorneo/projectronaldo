@@ -1,27 +1,105 @@
-import { db } from './firebase-config.js';
-import { doc, getDoc, setDoc, updateDoc } from "firebase/firestore";
-
 // Define initial attributes and their ratings with weight for each user
-let users = {};
+let users = {
+    "Zane": {
+        age: 30,
+        country: "Malaysia",
+        attributes: {
+            "Health and Fitness (25%)": {
+                weight: 0.25,
+                items: {
+                    "Stamina / 5km Run": 70,
+                    "Strength": 80,
+                    "Top G Exercise": 75
+                }
+            },
+            "Financial (25%)": {
+                weight: 0.25,
+                items: {
+                    "Money on Hand": 85
+                }
+            },
+            "Discipline (20%)": {
+                weight: 0.20,
+                items: {
+                    "Meditation / Focus": 78,
+                    "Charisma / 10s": 82,
+                    "Alarm @ 8am": 88
+                }
+            },
+            "Learning and Development (20%)": {
+                weight: 0.20,
+                items: {
+                    "Books Read": 90,
+                    "Other Language": 65,
+                    "Studying / Pomodoro": 70,
+                    "Social Media Following": 50
+                }
+            },
+            "Hobbies and Interests (10%)": {
+                weight: 0.10,
+                items: {
+                    "Chess Rank": 60,
+                    "Pickleball/Tennis": 75,
+                    "Boxing/MMA": 80
+                }
+            }
+        }
+    },
+    "Marc": {
+        age: 17,
+        country: "Malaysia",
+        attributes: {
+            "Health and Fitness (25%)": {
+                weight: 0.25,
+                items: {
+                    "Stamina / 5km Run": 65,
+                    "Strength": 70,
+                    "Top G Exercise": 60
+                }
+            },
+            "Financial (25%)": {
+                weight: 0.25,
+                items: {
+                    "Money on Hand": 50
+                }
+            },
+            "Discipline (20%)": {
+                weight: 0.20,
+                items: {
+                    "Meditation / Focus": 60,
+                    "Charisma / 10s": 70,
+                    "Alarm @ 8am": 75
+                }
+            },
+            "Learning and Development (20%)": {
+                weight: 0.20,
+                items: {
+                    "Books Read": 80,
+                    "Other Language": 60,
+                    "Studying / Pomodoro": 65,
+                    "Social Media Following": 40
+                }
+            },
+            "Hobbies and Interests (10%)": {
+                weight: 0.10,
+                items: {
+                    "Chess Rank": 55,
+                    "Pickleball/Tennis": 70,
+                    "Boxing/MMA": 65
+                }
+            }
+        }
+    }
+};
+
+// Load users from localStorage if available
+const savedUsers = localStorage.getItem('users');
+if (savedUsers) {
+    users = JSON.parse(savedUsers);
+}
 
 // Current user
 let currentUser = "Zane";
-
-// Fetch user data from Firestore
-async function fetchUserData() {
-    console.log("Fetching user data for:", currentUser);
-    const docRef = doc(db, "users", currentUser);
-    const docSnap = await getDoc(docRef);
-
-    if (docSnap.exists()) {
-        console.log("User data:", docSnap.data());
-        users[currentUser] = docSnap.data();
-        displayAttributes(currentUser);
-        document.getElementById('overall-score').textContent = calculateOverallScore(currentUser);
-    } else {
-        console.log("No such document!");
-    }
-}
 
 // Function to calculate overall weighted score
 function calculateOverallScore(user) {
@@ -92,20 +170,14 @@ function populateDropdowns() {
 }
 
 // Function to update attribute
-document.getElementById('update-form').addEventListener('submit', async function(event) {
+document.getElementById('update-form').addEventListener('submit', function(event) {
     event.preventDefault();
     const category = document.getElementById('category').value;
     const attribute = document.getElementById('attribute').value;
     const newValue = parseInt(document.getElementById('new-value').value, 10);
-
     if (attribute in users[currentUser].attributes[category].items && !isNaN(newValue) && newValue >= 0 && newValue <= 100) {
         users[currentUser].attributes[category].items[attribute] = newValue;
-
-        const docRef = doc(db, "users", currentUser);
-        await updateDoc(docRef, {
-            attributes: users[currentUser].attributes
-        });
-
+        localStorage.setItem('users', JSON.stringify(users)); // Save to localStorage
         displayAttributes(currentUser);
         document.getElementById('overall-score').textContent = calculateOverallScore(currentUser);
     }
@@ -116,7 +188,8 @@ document.getElementById('user-select').addEventListener('change', function(event
     currentUser = event.target.value;
     document.getElementById('user-name').textContent = currentUser;
     document.getElementById('user-age').textContent = users[currentUser].age;
-    fetchUserData();
+    displayAttributes(currentUser);
+    document.getElementById('overall-score').textContent = calculateOverallScore(currentUser);
     populateDropdowns();
 });
 
@@ -129,7 +202,7 @@ document.getElementById('password-form').addEventListener('submit', function(eve
         document.getElementById('content').style.display = 'block';
         document.getElementById('user-name').textContent = currentUser;
         document.getElementById('user-age').textContent = users[currentUser].age;
-        fetchUserData();
+        displayAttributes(currentUser);
         populateDropdowns();
         document.getElementById('overall-score').textContent = calculateOverallScore(currentUser);
     } else {
@@ -138,4 +211,3 @@ document.getElementById('password-form').addEventListener('submit', function(eve
 });
 
 // Initialize the page
-fetchUserData();
